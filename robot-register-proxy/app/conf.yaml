@@ -1,0 +1,9 @@
+message_broker:
+  host: localhost
+  port: 1883
+  client_name: RobotRegisterProxy
+  username: admin
+  password: admin
+  topics:
+    publish_to: /it/unime/fcrlab/robotics/register/token
+    subscribe_to: /it/unime/fcrlab/robotics/register
