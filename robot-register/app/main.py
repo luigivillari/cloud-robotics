@@ -1,8 +1,12 @@
 import yaml
+import os
 from robot_register import RobotRegister
 
 def main():
-    conffile = 'conf.yaml'
+    
+    script_dir = os.path.dirname(__file__)
+    conffile = os.path.join(script_dir, 'conf.yaml')
+    
     with open(conffile, 'r') as f:
         conf = yaml.safe_load(f)
 

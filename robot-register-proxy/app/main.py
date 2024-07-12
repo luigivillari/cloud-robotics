@@ -1,11 +1,14 @@
 import yaml
+import os
 from robot_register_proxy import RobotRegisterProxy
 from controllers.message_queue import MessageQueue
 from domain.register import Register
 
 
 def main():
-    conffile = 'conf.yaml'
+    script_dir = os.path.dirname(__file__)
+    conffile = os.path.join(script_dir, 'conf.yaml')
+
     with open(conffile, 'r') as f:
         conf = yaml.safe_load(f)
 
