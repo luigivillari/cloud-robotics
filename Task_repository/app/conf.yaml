@@ -1,4 +1,11 @@
 mongodb:
-  uri: "mongodb://localhost:27017/"
+  uri: "mongodb://root:example@localhost:27017/"
   database: "Cloud"
   collection: "tasks"
+token_path: "./robot/.token"
+message_broker:
+  host: "localhost"
+  port: 1883
+  topics:
+    publish_to: "/it/unime/fcrlab/robotics/task/response"
+    subscribe_to: "/it/unime/fcrlab/robotics/task/request"

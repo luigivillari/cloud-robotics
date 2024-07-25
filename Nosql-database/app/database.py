@@ -1,4 +1,3 @@
-import pymongo
 from pymongo import MongoClient
 import yaml
 import re
@@ -33,21 +32,19 @@ class MongoDBHandler:
         agent = self.collection.find_one({'agent_id': agent_id})
         return agent.get('token') if agent else None
     
-    def __generate_token(self, message) -> str:
+    def generate_token(self, message) -> str:
         """
         """
         return jwt.encode(message, "secret", algorithm="HS256")
 
-    def register_agent(self, agent_id, agent_data):
+    def register_agent(self, agent_id,token):
         # Validate MAC address
         if not self.is_valid_mac(agent_id):
             raise ValueError("Invalid MAC address")
         # Register the agent if not registered
         if not self.is_registered(agent_id):
-            # Generate a token
-            token = self.__generate_token({'agent_id': agent_id})
             # Insert agent data along with the generated token
-            self.collection.insert_one({'agent_id': agent_id, 'token': token, **agent_data})
+            self.collection.insert_one({'agent_id': agent_id, 'token': token})
             return True
         return False
     

@@ -1,5 +1,5 @@
 mongodb:
-  uri: "mongodb://localhost:27017/"
+  uri: "mongodb://root:example@localhost:27017/"
   database: "Cloud"
   collection: "token"
 token_path: "./robot/.token"
