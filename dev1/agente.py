@@ -1,15 +1,13 @@
 import sys
 import os
 
-# Aggiungi il percorso della libreria al sys.path
-sys.path.append('/opt/homebrew/lib/python3.11/site-packages')
 
-# Aggiungi il percorso della directory state_machine al sys.path
+sys.path.append('/opt/homebrew/lib/python3.11/site-packages')
 script_dir = os.path.dirname(__file__)
 state_machine_dir = os.path.join(script_dir, '..', 'state_machine')
 sys.path.append(state_machine_dir)
 
-# Importa il modulo dalla directory state_machine
+
 from macchina_stati import MacchinaStati
 
 import paho.mqtt.client as mqtt
