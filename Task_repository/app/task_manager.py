@@ -43,9 +43,11 @@ class TaskManager:
             data = json.loads(msg.payload)
             print(f"Message data: {data}")
             token = data['token']
-            compose = self.assign_task()
+            agent_id = data['agent_id']
+            compose = self.assign_task(agent_id)
+            print(compose)
             if token is not None:
-                response = {'task': compose}
+                response = {'agent_id':agent_id,'task': compose}
                 print(response)
                 self.mqtt_client.publish(self.config['message_broker']['topics']['publish_to'], json.dumps(response))
                 print(f"Published token to {self.config['message_broker']['topics']['publish_to']}")
@@ -53,10 +55,10 @@ class TaskManager:
             print(f"Error processing message: {e}")
                 
 
-    def assign_task(self):
-        task_content = self.task_repository.get_task()
+    def assign_task(self,agent_id):
+        task_content = self.task_repository.get_task(agent_id)
         if task_content:
-            return task_content['docker_compose']
+            return task_content
         else:
             return None
             

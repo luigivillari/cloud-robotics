@@ -1,0 +1,11 @@
+mongodb:
+  uri: "mongodb://root:example@172.30.101.2:27017/"
+  database: "Cloud"
+  collection: "token"
+token_path: "./robot/.token"
+message_broker:
+  host: "172.30.101.3"
+  port: 1883
+  topics:
+    publish_to: "/it/unime/fcrlab/robotics/register"
+    subscribe_to: "/it/unime/fcrlab/robotics/register/token"

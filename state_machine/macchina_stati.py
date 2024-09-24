@@ -1,44 +1,70 @@
+import sys
+import time
+from os.path import join, realpath, dirname
+import logging
 
-from transitions import Machine
-import random
+sys.path.append(join(dirname(realpath(__file__)), ".."))
 
-class MacchinaStati(object):
+from transitions_gui import WebMachine  # noqa
 
-    # Define some states. Most of the time, narcoleptic superheroes are just like
-    # everyone else. Except for...
-    states = ['have_token', 'have_compose', 'wake_up','execute_compose']
+logging.basicConfig(level=logging.INFO)
 
-    def __init__(self, name):
+class StateMachineApp:
+    def __init__(self):
+        # Definizione degli stati
+        self.states = ["init", "have token", "have compose", "running", "done"]
 
-        # No anonymous superheroes on my watch! Every narcoleptic superhero gets
-        # a name. Any name at all. SleepyMan. SlumberGirl. You get the idea.
-        self.name = name
+        # Definizione delle transizioni esplicite (senza "next_state")
+        self.transitions = [
+            ["request_token", "init", "have token"], 
+            ["request_compose", "have token", "have compose"],  
+            ["run", "have compose", "running"],  
+            ["finish", "running", "done"], 
+            ["request_compose", "done", "have compose"],  
+        ]
 
-        # What have we accomplished today?
-        self.kittens_rescued = 0
+       
+        self.styling = [
+           
+            {"selector": 'node', "css": {"shape": "ellipse"}},
+        ]
 
-        # Initialize the state machine
-        self.machine = Machine(model=self, states=MacchinaStati.states, initial='wake_up')
+        
+        self.machine = WebMachine(
+            states=self.states,
+            transitions=self.transitions,
+            initial="init",
+            name="Simple Machine",
+            ordered_transitions=False,  
+            ignore_invalid_triggers=True,
+            auto_transitions=False, 
+            graph_css=self.styling  
+        )
 
-        # Add some transitions. We could also define these using a static list of
-        # dictionaries, as we did with states above, and then pass the list to
-        # the Machine initializer as the transitions= argument.
+    # def run(self):
+    #     """Avvia la macchina a stati e gestisce le transizioni manualmente"""
+    #     try:
+    #         while True:
+    #             time.sleep(5)
+            
+    #             if self.machine.state == 'init':
+    #                 self.machine.request_token()
+    #                 print(self.machine.state) 
+    #             elif self.machine.state == 'have token':
+    #                 self.machine.request_compose()  
+    #             elif self.machine.state == 'have compose':
+    #                 self.machine.run()  
+    #             elif self.machine.state == 'running':
+    #                 self.machine.finish() 
+    #             elif self.machine.state == 'done':
+    #                 self.machine.request_compose() 
+    #     except KeyboardInterrupt:  
+    #         self.machine.stop_server()
+    #         logging.info("Macchina a stati interrotta manualmente.")
 
-        # At some point, every superhero must rise and shine.
-        self.machine.add_transition(trigger='token_request', source='wake_up', dest='have_token')
 
-        # Superheroes need to keep in shape.
-        self.machine.add_transition('compose_request', 'have_token', 'have_compose')
-
-        # Those calories won't replenish themselves!
-        self.machine.add_transition('run', 'have_compose', 'execute_compose')
-
-if __name__ == '__main__':
-    narcoleptic_superhero = MacchinaStati('Nodo_Edge')
-    print(narcoleptic_superhero.state)
-    narcoleptic_superhero.token_request()
-    print(narcoleptic_superhero.state)
-    narcoleptic_superhero.compose_request()
-    print(narcoleptic_superhero.state)
-    narcoleptic_superhero.run()
-    print(narcoleptic_superhero.state)
+if __name__ == "__main__":
+    app = StateMachineApp()
+    app.machine.run()
+    
+    

@@ -1,24 +1,16 @@
 import sys
-import os
 
-
+# Aggiungi il percorso della libreria al sys.path
 sys.path.append('/opt/homebrew/lib/python3.11/site-packages')
-script_dir = os.path.dirname(__file__)
-state_machine_dir = os.path.join(script_dir, '..', 'state_machine')
-sys.path.append(state_machine_dir)
-
-
-from macchina_stati import MacchinaStati
 
 import paho.mqtt.client as mqtt
 import json
 import subprocess
+import os
+from getmac import get_mac_address
 
 
-
-agent_id = "00:1A:2B:3C:4D:5E"
-
-Nodo_edge = MacchinaStati('Nodo_Edge')
+agent_id = "00:16:3E:5A:7B:01"
 
 # Configurazione del broker MQTT
 broker_host = "localhost"
@@ -29,9 +21,10 @@ publish_topic_task = "/it/unime/fcrlab/robotics/task/request"
 subscribe_topic_task = "/it/unime/fcrlab/robotics/task/response"
 
 def create_hidden_file(token):
-    hidden_file = ".token"
+    hidden_file = os.path.join(os.getcwd(), ".token")
     with open(hidden_file, "w") as file:
         file.write(token) 
+    print(f"Creato il file .token in: {hidden_file}")
 
 def check_hidden_file():
     hidden_file = ".token"
@@ -46,7 +39,6 @@ def check_hidden_file():
 def on_connect(client, userdata, flags, rc, properties=None):
     print("Connected with result code " + str(rc))
 
-    print(Nodo_edge.state)
     file_exists, token = check_hidden_file()
 
     if not file_exists:
@@ -59,9 +51,6 @@ def on_connect(client, userdata, flags, rc, properties=None):
         print(f"Published request to {publish_topic}")
 
     else:
-        Nodo_edge.request_token()
-        print(Nodo_edge.state)
-
         client.subscribe(subscribe_topic_task)
         print(f"Subscribed to task_topic {subscribe_topic_task}")
 
@@ -81,9 +70,6 @@ def on_message(client, userdata, msg):
             print("Received token:", response['token'])
             create_hidden_file(response['token'])
 
-            Nodo_edge.token_request()
-            print(Nodo_edge.state)
-
             client.subscribe(subscribe_topic_task)
             print(f"Subscribed to task_topic {subscribe_topic_task}")
 
@@ -99,17 +85,11 @@ def on_message(client, userdata, msg):
             task_content = response['task']
             compose_file_path = os.path.join(os.path.dirname(__file__), 'docker-compose.yml')
 
-            Nodo_edge.compose_request()
-            print(Nodo_edge.state)
-
             try:
                 with open(compose_file_path, 'w') as file:
                     file.write(task_content)
                 print(f"File docker-compose.yml creato in {compose_file_path}")
                 
-                Nodo_edge.run()
-                print(Nodo_edge.state)
-
                 # Esegui docker-compose up
                 subprocess.run(['docker-compose', 'up', '-d'], check=True)
                 print("Servizi avviati con docker-compose")
@@ -122,7 +102,7 @@ def on_message(client, userdata, msg):
 
         
       
-        client.disconnect()
+        #client.disconnect()
 
 agent_client = mqtt.Client(client_id="agent_client", protocol=mqtt.MQTTv5)
 

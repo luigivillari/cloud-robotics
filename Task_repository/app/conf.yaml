@@ -1,7 +1,7 @@
 mongodb:
   uri: "mongodb://root:example@localhost:27017/"
   database: "Cloud"
-  collection: "tasks"
+  collection: "Task"
 token_path: "./robot/.token"
 message_broker:
   host: "localhost"

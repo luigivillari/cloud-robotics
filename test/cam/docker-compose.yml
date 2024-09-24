@@ -1,0 +1,19 @@
+version: '3'
+services:
+  camera_node:
+    image: ros:noetic-ros-base  # Immagine ROS Noetic
+    container_name: ros_camera_node
+    volumes:
+      - ./camera.py:/home/camera.py  # Monta lo script locale nel container
+    command: bash -c "source /opt/ros/noetic/setup.bash && python3 /home/camera.py"
+    environment:
+      - ROS_MASTER_URI=http://localhost:11311  # Configura ROS Master URI
+      - ROS_HOSTNAME=localhost                 # Configura ROS Hostname
+    networks:
+      - ros_network
+    ports:
+      - "11311:11311" 
+
+networks:
+  ros_network: #necessario per far comunicare i nodi  ros
+    driver: bridge

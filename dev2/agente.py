@@ -101,7 +101,7 @@ def on_message(client, userdata, msg):
 
         
       
-        client.disconnect()
+        #client.disconnect()
 
 agent_client = mqtt.Client(client_id="agent_client", protocol=mqtt.MQTTv5)
 
