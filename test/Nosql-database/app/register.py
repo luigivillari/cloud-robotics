@@ -8,6 +8,7 @@ import paho.mqtt.client as mqtt
 import json
 import yaml
 from database import MongoDBHandler
+import time
 
 class Register:
     def __init__(self, config_path='conf.yaml'):
@@ -63,13 +64,16 @@ class Register:
         logging.info(f"Received message on {msg.topic}")
         try:
             data = json.loads(msg.payload)
+            time_t1 = time.time()
             logging.info(f"Message data: {data}")
             agent_id = data['agent_id']
             token = self.verify_and_register(agent_id)
             logging.info(f"Token generated: {token}")
-            response = {'agent_id': agent_id, 'token': token}
-            self.mqtt_client.publish(self.config['message_broker']['topics']['publish_to'], json.dumps(response))
-            logging.info(f"Published token to {self.config['message_broker']['topics']['publish_to']}")
+            response = {'agent_id': agent_id, 'token': token, 'time_t1': time_t1}
+            topic = self.config['message_broker']['topics']['publish_to']
+            full_topic = f"{topic}{agent_id}"
+            self.mqtt_client.publish(full_topic, json.dumps(response))
+            logging.info(f"Published token to {full_topic}")
         except Exception as e:
             logging.error(f"Error processing message: {e}")
 

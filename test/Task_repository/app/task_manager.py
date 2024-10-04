@@ -4,6 +4,7 @@ import yaml
 import json
 import paho.mqtt.client as mqtt
 from task_repository import TaskRepository
+import time
 
 class TaskManager:
     def __init__(self, config_path='conf.yaml'):
@@ -58,16 +59,19 @@ class TaskManager:
         
         try:
             data = json.loads(msg.payload)
+            time_t2 = time.time()
             logging.info(f"Message data: {data}")
             token = data['token']
             agent_id = data['agent_id']
             compose = self.assign_task(agent_id)
             logging.info(f"Assigned task: {compose}")
             if token is not None:
-                response = {'agent_id': agent_id, 'task': compose}
+                response = {'agent_id': agent_id, 'task': compose,'time_t2': time_t2}
                 logging.info(f"Publishing response: {response}")
-                self.mqtt_client.publish(self.config['message_broker']['topics']['publish_to'], json.dumps(response))
-                logging.info(f"Published token to {self.config['message_broker']['topics']['publish_to']}")
+                topic = self.config['message_broker']['topics']['publish_to']
+                full_topic = f"{topic}{agent_id}"
+                self.mqtt_client.publish(full_topic, json.dumps(response))
+                logging.info(f"Published token to {full_topic}")
         except Exception as e:
             logging.error(f"Error processing message: {e}")
 

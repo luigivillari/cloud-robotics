@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 import json
 import yaml
 from database import MongoDBHandler
-
+import time
 class Register:
     def __init__(self, config_path='conf.yaml'):
       
@@ -38,7 +38,7 @@ class Register:
         else:
             print(f"Failed to connect, return code {rc}")
 
-    def on_disconnect(self, client, userdata, rc):
+    def on_disconnect(self, client, userdata, rc, proprieties=None):
         print("Disconnected with result code " + str(rc))
         if rc != 0:
             print("Unexpected disconnection.")
@@ -47,13 +47,17 @@ class Register:
         print(f"Received message on {msg.topic}")
         try:
             data = json.loads(msg.payload)
+            time_t1 = time.time()
             print(f"Message data: {data}")
             agent_id = data['agent_id']
             token = self.verify_and_register(agent_id)
             print(token)
-            response = {'agent_id': agent_id, 'token': token}
-            self.mqtt_client.publish(self.config['message_broker']['topics']['publish_to'], json.dumps(response))
-            print(f"Published token to {self.config['message_broker']['topics']['publish_to']}")
+            response = {'agent_id': agent_id, 'token': token, 'time_t1': time_t1}
+            print(time_t1)
+            topic = self.config['message_broker']['topics']['publish_to']
+            full_topic = f"{topic}{agent_id}"
+            self.mqtt_client.publish(full_topic, json.dumps(response))
+            print(f"Published token to {full_topic}")
         except Exception as e:
             print(f"Error processing message: {e}")
 

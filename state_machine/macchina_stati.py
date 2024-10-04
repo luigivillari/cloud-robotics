@@ -41,30 +41,32 @@ class StateMachineApp:
             graph_css=self.styling  
         )
 
-    # def run(self):
-    #     """Avvia la macchina a stati e gestisce le transizioni manualmente"""
-    #     try:
-    #         while True:
-    #             time.sleep(5)
+    def run(self):
+        """Avvia la macchina a stati e gestisce le transizioni manualmente"""
+        try:
+            time.sleep(50)
+            while True:
+                
+                time.sleep(1)
             
-    #             if self.machine.state == 'init':
-    #                 self.machine.request_token()
-    #                 print(self.machine.state) 
-    #             elif self.machine.state == 'have token':
-    #                 self.machine.request_compose()  
-    #             elif self.machine.state == 'have compose':
-    #                 self.machine.run()  
-    #             elif self.machine.state == 'running':
-    #                 self.machine.finish() 
-    #             elif self.machine.state == 'done':
-    #                 self.machine.request_compose() 
-    #     except KeyboardInterrupt:  
-    #         self.machine.stop_server()
-    #         logging.info("Macchina a stati interrotta manualmente.")
+                if self.machine.state == 'init':
+                    self.machine.request_token()
+                    print(self.machine.state) 
+                elif self.machine.state == 'have token':
+                    self.machine.request_compose()  
+                elif self.machine.state == 'have compose':
+                    self.machine.run()  
+                elif self.machine.state == 'running':
+                    self.machine.finish() 
+                elif self.machine.state == 'done':
+                    self.machine.request_compose() 
+        except KeyboardInterrupt:  
+            self.machine.stop_server()
+            logging.info("Macchina a stati interrotta manualmente.")
 
 
 if __name__ == "__main__":
     app = StateMachineApp()
-    app.machine.run()
+    app.run()
     
     

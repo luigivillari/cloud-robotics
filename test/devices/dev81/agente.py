@@ -1,4 +1,5 @@
 import sys
+import threading  # Importa il modulo threading
 
 # Aggiungi il percorso della libreria al sys.path
 sys.path.append('/opt/homebrew/lib/python3.11/site-packages')
@@ -7,18 +8,20 @@ import paho.mqtt.client as mqtt
 import json
 import subprocess
 import os
-from getmac import get_mac_address
+import time
 
+start_time_t0 = 0
+start_time_t1 = 0
 
 agent_id = "1081"
 
 # Configurazione del broker MQTT
 broker_host = "localhost"
 broker_port = 1883
-publish_topic = "/it/unime/fcrlab/robotics/register"
+publish_topic = "/it/unime/fcrlab/robotics/register1081"
 subscribe_topic = "/it/unime/fcrlab/robotics/register/token"
 publish_topic_task = "/it/unime/fcrlab/robotics/task/request"
-subscribe_topic_task = "/it/unime/fcrlab/robotics/task/response"
+subscribe_topic_task = "/it/unime/fcrlab/robotics/task/response1081"
 
 def create_hidden_file(token):
     hidden_file = os.path.join(os.getcwd(), ".token")
@@ -35,6 +38,16 @@ def check_hidden_file():
                 return True, content
     return False, None
 
+# Funzione per eseguire il docker-compose in un thread separato
+def execute_docker_compose(compose_file_path):
+    try:
+        start_time_t2 = time.time()
+        os.system('docker-compose up -d')
+        end_time_t3 = time.time()
+        print(f"Tempo di avvio compose: {end_time_t3 - start_time_t2} secondi")
+        print("Servizi avviati con docker-compose")
+    except Exception as e:
+        print(f"Errore durante la gestione del task: {e}")
 
 def on_connect(client, userdata, flags, rc, properties=None):
     print("Connected with result code " + str(rc))
@@ -57,9 +70,6 @@ def on_connect(client, userdata, flags, rc, properties=None):
         request = {'agent_id': agent_id, 'token': token}
         client.publish(publish_topic_task, json.dumps(request))
         print(f"Published request to task_topic {publish_topic_task}")
-
-    
-
 
 def on_message(client, userdata, msg):
     print(f"Received message on {msg.topic}")
@@ -89,10 +99,19 @@ def on_message(client, userdata, msg):
                     with open(compose_file_path, 'w') as file:
                         file.write(task_content)
                     print(f"File docker-compose.yml creato in {compose_file_path}")
-                    
+
                     # Esegui docker-compose up
-                    subprocess.run(['docker-compose', 'up', '-d'], check=True)
-                    print("Servizi avviati con docker-compose")
+                    #subprocess.run(['docker-compose', 'up', '-d'], check=True)
+                    #docker run --network cloud -p 1885:1883 -v /var/run/docker.sock:/var/run/docker.sock -it device-image
+
+                    # os.system('docker-compose up -d')
+                    # end_time_t3 = time.time()
+                    # print(f"tempo di avvio compose: {end_time_t3 - start_time_t2} ")
+                    # print("Servizi avviati con docker-compose")
+                    
+                    # Avvia il docker-compose in un thread separato
+                    compose_thread = threading.Thread(target=execute_docker_compose, args=(compose_file_path,))
+                    compose_thread.start()
                     
                 except Exception as e:
                     print(f"Errore durante la gestione del task: {e}")
