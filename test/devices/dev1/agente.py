@@ -38,11 +38,12 @@ def check_hidden_file():
                 return True, content
     return False, None
 
-# Funzione per eseguire il docker-compose in un thread separato
+
 def execute_docker_compose(compose_file_path):
     try:
         start_time_t2 = time.time()
         os.system('docker-compose up -d')
+        #subprocess.run(['docker-compose', 'up', '-d'], check=True, cwd=os.path.dirname(compose_file_path))
         end_time_t3 = time.time()
         print(f"Tempo di avvio compose: {end_time_t3 - start_time_t2} secondi")
         print("Servizi avviati con docker-compose")
@@ -110,8 +111,9 @@ def on_message(client, userdata, msg):
                     # print("Servizi avviati con docker-compose")
                     
                     # Avvia il docker-compose in un thread separato
-                    compose_thread = threading.Thread(target=execute_docker_compose, args=(compose_file_path,))
-                    compose_thread.start()
+                    #compose_thread = threading.Thread(target=execute_docker_compose, args=(compose_file_path,))
+                    #compose_thread.start()
+                    execute_docker_compose(compose_file_path)
                     
                 except Exception as e:
                     print(f"Errore durante la gestione del task: {e}")

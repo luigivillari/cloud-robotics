@@ -1,0 +1,17 @@
+/Users/luigivillari/Documents/elaborato_finale/cloud-robotics/test/devices/dev115/agente.py:128: DeprecationWarning: Callback API version 1 is deprecated, update to latest version
+  agent_client = mqtt.Client(client_id=agent_id, protocol=mqtt.MQTTv5)
+Creating ros_camera_node_1142 ... 
+Creating ros_camera_node_1142 ... done
+Connected with result code Success
+Subscribed to /it/unime/fcrlab/robotics/register/token
+Published request to /it/unime/fcrlab/robotics/register1115
+Received message on /it/unime/fcrlab/robotics/register1115
+Received token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudF9pZCI6IjExMTUifQ.A6yLivzrhpBIDppc-bxL7yFXRtMn6dpdbG3KF8Yx2NQ
+Creato il file .token in: /Users/luigivillari/Documents/elaborato_finale/cloud-robotics/test/devices/dev115/.token
+Subscribed to task_topic /it/unime/fcrlab/robotics/task/response1115
+{'agent_id': '1115', 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudF9pZCI6IjExMTUifQ.A6yLivzrhpBIDppc-bxL7yFXRtMn6dpdbG3KF8Yx2NQ'}
+Published request to task_topic /it/unime/fcrlab/robotics/task/request
+Received message on /it/unime/fcrlab/robotics/task/response1115
+File docker-compose.yml creato in /Users/luigivillari/Documents/elaborato_finale/cloud-robotics/test/devices/dev115/docker-compose.yml
+Tempo di avvio compose: 114.65776491165161 secondi
+Servizi avviati con docker-compose

@@ -1,4 +1,5 @@
 import sys
+import threading  # Importa il modulo threading
 sys.path.append('/opt/homebrew/lib/python3.11/site-packages')
 
 import paho.mqtt.client as mqtt
@@ -6,14 +7,13 @@ import json
 import yaml
 from database import MongoDBHandler
 import time
+
 class Register:
     def __init__(self, config_path='conf.yaml'):
-      
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
 
         self.db_handler = MongoDBHandler(config_path)
-
 
         self.mqtt_client = mqtt.Client(client_id="register", protocol=mqtt.MQTTv5)
         self.mqtt_client.on_connect = self.on_connect
@@ -21,13 +21,11 @@ class Register:
         self.mqtt_client.on_disconnect = self.on_disconnect
         self.mqtt_client.username_pw_set("admin", "admin")
 
-   
         self.mqtt_client.connect(
             self.config['message_broker']['host'],
             port=self.config['message_broker']['port']
         )
 
-       
         self.mqtt_client.loop_forever()
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
@@ -44,6 +42,14 @@ class Register:
             print("Unexpected disconnection.")
 
     def on_message(self, client, userdata, msg):
+        # Avvia un thread per gestire ogni messaggio in arrivo
+        thread = threading.Thread(target=self.handle_message, args=(msg,))
+        thread.start()
+
+    def handle_message(self, msg):
+        """
+        Funzione che gestisce il messaggio ricevuto. Viene eseguita in un thread separato.
+        """
         print(f"Received message on {msg.topic}")
         try:
             data = json.loads(msg.payload)
@@ -76,8 +82,6 @@ class Register:
         else:
             token = self.db_handler.generate_token({'agent_id': agent_id})
             if not isinstance(token, str):
-                token = str(token) # Genera un nuovo token
-
-            self.db_handler.register_agent(agent_id,token)
+                token = str(token)  # Genera un nuovo token
+            self.db_handler.register_agent(agent_id, token)
             return token
-

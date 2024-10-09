@@ -58,7 +58,7 @@ class MongoDBHandler:
         if not self.is_registered(agent_id):
             self.register_agent(agent_id, agent_data)
         
-        # Get the token for the agent
+     
         token = self.get_token(agent_id)
         
         return token

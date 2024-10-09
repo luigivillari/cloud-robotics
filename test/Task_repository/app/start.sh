@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Avvia il servizio NTP
-ntpd -g
 
-# Esegui il programma Python
+ntpd -g
 python /app/main.py

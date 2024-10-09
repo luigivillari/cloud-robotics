@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Avvia il servizio NTP
-ntpd -g
 
-# Esegui il programma Python
-python /app/agente.py
+ntpd -g
+python /app/agente_container.py

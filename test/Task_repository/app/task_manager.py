@@ -2,26 +2,27 @@ import os
 import logging
 import yaml
 import json
+import threading
 import paho.mqtt.client as mqtt
 from task_repository import TaskRepository
 import time
 
 class TaskManager:
     def __init__(self, config_path='conf.yaml'):
-        # Impostazione del logging
+      
         log_dir = "/app/logs"
-        os.makedirs(log_dir, exist_ok=True)  # Crea la directory logs se non esiste
+        os.makedirs(log_dir, exist_ok=True)  
         logging.basicConfig(
             filename=os.path.join(log_dir, 'task_manager.log'),
-            filemode='a',  # Append al file di log
+            filemode='a',
             format='%(asctime)s - %(levelname)s - %(message)s',
             level=logging.INFO
         )
 
-        # Logga l'inizio del processo
+      
         logging.info("Starting TaskManager service")
 
-        # Carica il file di configurazione
+       
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
 
@@ -54,7 +55,13 @@ class TaskManager:
         else:
             logging.error(f"Failed to connect, return code {rc}")
 
+
     def on_message(self, client, userdata, msg):
+       
+        thread = threading.Thread(target=self.handle_message, args=(client,userdata,msg))
+        thread.start()
+
+    def handle_message(self, client, userdata, msg):
         logging.info(f"Received message on {msg.topic}")
         
         try:

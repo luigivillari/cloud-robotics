@@ -7,22 +7,23 @@ import logging
 import paho.mqtt.client as mqtt
 import json
 import yaml
+import threading
 from database import MongoDBHandler
 import time
 
 class Register:
     def __init__(self, config_path='conf.yaml'):
-        # Imposta il logging
+
         log_dir = "/app/logs"
-        os.makedirs(log_dir, exist_ok=True)  # Crea la directory logs se non esiste
+        os.makedirs(log_dir, exist_ok=True) 
         logging.basicConfig(
             filename=os.path.join(log_dir, 'register.log'),
-            filemode='a',  # Append al file di log
+            filemode='a',  
             format='%(asctime)s - %(levelname)s - %(message)s',
             level=logging.INFO
         )
 
-        # Logga l'inizio del processo
+  
         logging.info("Starting Register service")
 
         with open(config_path, 'r') as file:
@@ -61,6 +62,11 @@ class Register:
             logging.warning("Unexpected disconnection.")
 
     def on_message(self, client, userdata, msg):
+        thread = threading.Thread(target=self.handle_message, args=(client,userdata,msg))
+        thread.start()
+    
+
+    def handle_message(self, client, userdata, msg):
         logging.info(f"Received message on {msg.topic}")
         try:
             data = json.loads(msg.payload)
@@ -77,6 +83,7 @@ class Register:
         except Exception as e:
             logging.error(f"Error processing message: {e}")
 
+
     def verify_and_register(self, agent_id):
         """
         Verifica se l'agente è registrato. Se non è registrato, registra l'agente e restituisce il token.
@@ -92,7 +99,7 @@ class Register:
         else:
             token = self.db_handler.generate_token({'agent_id': agent_id})
             if not isinstance(token, str):
-                token = str(token)  # Genera un nuovo token
+                token = str(token) 
 
             self.db_handler.register_agent(agent_id, token)
             return token

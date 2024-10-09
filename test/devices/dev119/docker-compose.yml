@@ -1,0 +1,12 @@
+version: '3'
+services:
+  camera_node_1185:
+    image: ros:noetic-ros-base
+    container_name: ros_camera_node_1185
+    command: bash -c "source /opt/ros/noetic/setup.bash && python3 -c \"print('camera
+      on')\""
+    environment:
+    - ROS_MASTER_URI=http://localhost:13196
+    - ROS_HOSTNAME=localhost
+    ports:
+    - 13196:13196

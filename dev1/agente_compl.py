@@ -80,7 +80,6 @@ def on_connect(client, userdata, flags, rc, properties=None):
         print(f"Published request to {publish_topic}")
 
     else:
-        # Prima di richiedere nuove task, eseguiamo il docker-compose locale se esiste
         if check_local_compose():
             Nodo_edge.machine.request_compose()
             print("Compose locale trovato, eseguo il compose")
